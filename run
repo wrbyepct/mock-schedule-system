@@ -1,0 +1,48 @@
+#!/bin/bash
+
+##
+# QA
+##
+
+lint() {
+    git add .; uvx pre-commit run --all-files # uvx run package one time by borrowing installing
+}
+
+commit() {
+    uvx --from commitizen cz commit
+}
+
+##
+# Docker
+##
+
+dev() {
+    uv run uvicorn src.main:app --reload
+}
+
+up() {
+    docker compose -f "./docker/local/docker-compose.yml" up --build -d
+}
+
+down() {
+    docker compose -f "./docker/local/docker-compose.yml" down
+}
+
+##
+# DB
+##
+
+migrations() {
+    if [ -z "$1" ]; then
+        echo "Error: migration message is required."
+        echo "Usage: ./run migrations 'your message here'"
+        exit 1
+    fi
+    alembic revision --autogenerate -m "$1"
+}
+
+migrate() {
+    alembic upgrade head
+}
+
+"$@"
