@@ -1,6 +1,9 @@
-def main():
-    print("Hello from mock-schedule-system!")
+from fastapi import FastAPI
 
 
-if __name__ == "__main__":
-    main()
+app = FastAPI()
+
+
+@app.get("/health", tags=["health"])
+def health():
+    return {"status": "Healthy"}
