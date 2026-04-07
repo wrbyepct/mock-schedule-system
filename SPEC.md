@@ -350,7 +350,7 @@ moving to the next spike. Each spike is self-contained.
 
 ### Spike 1 — Project metadata and dependency declaration
 
-**Status**: ☐ Not started
+**Status**: ✅ Complete
 
 **Goal**:
 Establish the project's Python package configuration and declare all
@@ -419,7 +419,7 @@ is committed so other developers know what variables to fill in.
 
 ### Spike 2 — Environment configuration and settings management
 
-**Status**: ☐ Not started
+**Status**: ✅ Complete
 
 **Depends on**: Spike 1 (pyproject.toml and .env.example must exist)
 
@@ -470,7 +470,7 @@ once at module load time — not re-read on every import.
 
 ### Spike 3 — Application Dockerfile
 
-**Status**: ☐ Not started
+**Status**: ✅ Complete
 
 **Depends on**: Spike 1 (pyproject.toml must exist)
 
@@ -643,6 +643,85 @@ checks and future deployment readiness probes.
 - CORS origins must come from `settings`, never hardcoded
 - The health check opens its own lightweight connection rather than
   using `get_db_session`, to avoid masking session factory issues
+
+---
+
+### Spike 6 — Docker Compose: local development and on-premise deployment
+
+**Status**: ☐ Not started
+
+**Depends on**: Spike 3 (Dockerfile), Spike 4 (database), Spike 5 (app factory + health check)
+
+**Goal**:
+Wire all services together in a single `docker-compose.yml` so the entire
+stack — API, Celery worker, PostgreSQL, and Redis — can be started with
+one command for both local development and on-premise deployment.
+
+**Context**:
+One Dockerfile serves both the `api` and `worker` services. PostgreSQL
+and Redis are pulled from official images. Environment variables are
+never baked into the image — they are injected at runtime via the
+`env_file` directive pointing at `.env`.
+
+The `api` service exposes port 8000 and includes a health check that
+calls `GET /health`. This is the readiness signal used by docker-compose
+to gate dependent services and by future deployment probes.
+
+**File to create**: `docker-compose.yml` at the project root
+
+**Acceptance Criteria**:
+- [ ] `docker-compose.yml` exists at the project root with four services:
+        `api`, `worker`, `db`, `redis`
+
+- [ ] `api` service:
+        - Builds from the project `Dockerfile`
+        - Command: `uvicorn app.main:app --host 0.0.0.0 --port 8000`
+        - Injects environment from `.env` via `env_file: .env`
+        - Publishes port `8000:8000`
+        - Depends on `db` and `redis`
+        - Health check: `curl -f http://localhost:8000/health`
+          with `interval: 30s`, `timeout: 10s`, `retries: 3`
+
+- [ ] `worker` service:
+        - Builds from the same `Dockerfile` (shared image)
+        - Command: `celery -A app.celery_app worker --loglevel=info`
+        - Injects environment from `.env` via `env_file: .env`
+        - Depends on `db` and `redis`
+        - No exposed ports
+
+- [ ] `db` service:
+        - Image: `postgres:16-alpine`
+        - Environment variables set from `.env` fields:
+          `POSTGRES_USER`, `POSTGRES_PASSWORD`, `POSTGRES_DB`
+        - Mounts a named volume `postgres_data` for persistence
+        - Exposes port `5432` to host (for local introspection)
+
+- [ ] `redis` service:
+        - Image: `redis:7-alpine`
+        - Mounts a named volume `redis_data` for persistence
+        - Exposes port `6379` to host (for local introspection)
+
+- [ ] Named volumes `postgres_data` and `redis_data` declared at the
+      bottom of the file under `volumes:`
+
+- [ ] `.env.example` updated to include the three Postgres vars:
+        # --- Database (Docker Compose) ---
+        POSTGRES_USER=shift_scheduler
+        POSTGRES_PASSWORD=your-db-password-here
+        POSTGRES_DB=shift_scheduler
+
+- [ ] `docker compose up --build` starts all four services without errors
+- [ ] `GET /health` returns `{"status":"ok","database":"ok","redis":"ok"}`
+      when all services are running
+
+**Notes**:
+- `DATABASE_URL` in `.env` must point to the `db` service hostname, not
+  `localhost`, when running inside Docker Compose:
+  `postgresql+asyncpg://user:password@db:5432/shift_scheduler`
+- `REDIS_URL`, `CELERY_BROKER_URL`, and `CELERY_RESULT_BACKEND` must
+  similarly use `redis://redis:6379/0` inside Docker Compose.
+- Do not hardcode credentials in `docker-compose.yml` — always read
+  them from the `env_file`.
 
 ---
 
