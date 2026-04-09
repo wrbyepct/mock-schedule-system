@@ -1,0 +1,2 @@
+class SkillTag:
+    pass
