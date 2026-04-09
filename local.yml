@@ -1,19 +1,14 @@
 services:
   db:
-    image: postgres:15
-    environment:
-      TZ: Asia/Taipei
-      # change these in production
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: password
-      POSTGRES_DB: schedule_system
-
+    image: postgres:15-bookworm
+    env_file:
+      - ./.envs/local/db.env
     ports:
       - "5432:5432"
     volumes:
       - db_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d schedule_system"]
+      test: ["CMD-SHELL", "pg_isready -U schedule_app -d schedule_system"]
       interval: 10s
       timeout: 5s
       retries: 5

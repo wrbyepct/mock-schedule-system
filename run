@@ -32,6 +32,10 @@ local-up() {
     docker compose -f "local.yml" up --build -d
 }
 
+local-down() {
+    docker compose -f "local.yml" down
+}
+
 ##
 # DB
 ##
