@@ -1,12 +1,30 @@
-from sqlalchemy.ext.asyncio import create_async_engine
-from .config import settings
+from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio.session import async_sessionmaker
+from sqlmodel import text
 
-# Engine
+from app.shared.config import settings
+
 engine = create_async_engine(
     url=settings.DATABASE_URL,
-    echo=settings.DEBUG,  # for sql query logging, debugging purposes
-    pool_pre_ping=True,  # for handling stale connections, especially in production environments
-    pool_recycle=3600,  # recycle connections after 1 hour to prevent timeouts
+    echo=settings.DEBUG,
+    pool_pre_ping=True,
+    pool_recycle=3600,
 )
 
-# Session
+AsyncSessionLocal = async_sessionmaker(
+    bind=engine, class_=AsyncSession, expire_on_commit=False
+)
+
+
+async def get_db():
+    async with AsyncSessionLocal() as session:
+        yield session
+
+
+async def init_db():
+    try:
+        async with engine.begin() as conn:
+            await conn.execute(text("SELECT 'hello"))
+        print("DB connects successfully")
+    except Exception:
+        print("Failed connects to db: {e}")

@@ -1,7 +1,29 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 
+from app.shared.database import engine, init_db
 
-app = FastAPI()
+from .routers import add_all_routers
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()
+    yield
+    await engine.dispose()
+
+
+version = "v1"
+
+app = FastAPI(
+    title="Medical Schedule",
+    description="Medical Schedule",
+    version=version,
+    lifespan=lifespan,
+)
+
+add_all_routers(app)
 
 
 @app.get("/health", tags=["health"])
