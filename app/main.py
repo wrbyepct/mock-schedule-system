@@ -17,8 +17,8 @@ async def lifespan(app: FastAPI):
 version = "v1"
 
 app = FastAPI(
-    title="Medical Schedule",
-    description="Medical Schedule",
+    title="Medical Scheduler",
+    description="Medical Scheduler",
     version=version,
     lifespan=lifespan,
 )
