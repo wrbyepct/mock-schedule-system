@@ -28,6 +28,10 @@ down() {
     docker compose -f "./docker/local/docker-compose.yml" down
 }
 
+local-up() {
+    docker compose -f "local.yml" up --build -d
+}
+
 ##
 # DB
 ##
