@@ -1,6 +1,6 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
-from sqlalchemy.ext.asyncio.session import async_sessionmaker
-from sqlmodel import text
+from sqlalchemy import text
+from sqlalchemy.ext.asyncio import async_sessionmaker, create_async_engine
+from sqlmodel.ext.asyncio.session import AsyncSession
 
 from app.shared.config import settings
 
@@ -12,7 +12,9 @@ engine = create_async_engine(
 )
 
 AsyncSessionLocal = async_sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False,
 )
 
 
@@ -24,7 +26,7 @@ async def get_db():
 async def init_db():
     try:
         async with engine.begin() as conn:
-            await conn.execute(text("SELECT 'hello'"))
-        print("DB connects successfully!")
+            await conn.execute((text("SELECT 'hello'")))
+        print("DB connect successfully")
     except Exception:
-        print("Fail connects the db: {e}")
+        print("Failed to connect db: {e}")

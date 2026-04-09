@@ -1,8 +1,7 @@
 from datetime import datetime
 from uuid import UUID, uuid4
 
-from sqlalchemy import func
-from sqlmodel import Field, SQLModel
+from sqlmodel import Field, SQLModel, func
 
 
 class TimestampMixin(SQLModel, table=False):
@@ -13,18 +12,16 @@ class TimestampMixin(SQLModel, table=False):
         nullable=False,
         index=True,
     )
+
     created_at: datetime | None = Field(
-        default=None,
-        sa_column_kwargs={
-            "server_default": func.now(),
-            "nullable": False,
-        },
+        default=None, sa_column_kwargs={"server_default": func.now(), "nullable": False}
     )
+
     updated_at: datetime | None = Field(
         default=None,
         sa_column_kwargs={
             "server_default": func.now(),
             "onupdate": func.now(),
-            "nullable": False,
+            "nullable": True,
         },
     )

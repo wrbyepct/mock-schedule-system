@@ -16,6 +16,7 @@ async def lifespan(app: FastAPI):
 
 version = "v1"
 
+
 app = FastAPI(
     title="Medical Scheduler",
     description="Medical Scheduler",
@@ -23,9 +24,16 @@ app = FastAPI(
     lifespan=lifespan,
 )
 
+
 add_all_routers(app)
 
 
-@app.get("/health", tags=["health"])
+# TODO: Registration related models: TimestampMixin, Department, User, SkillTag(System), UserSkillTag(This skill is possesed by what users)
+# TODO: alembic setup
+# TODO: password hash service
+# TODO: Register logic
+
+
+@app.get("/health/", tags=["health"])
 def health():
-    return {"status": "Healthy"}
+    return {"status": "Healthy!"}
