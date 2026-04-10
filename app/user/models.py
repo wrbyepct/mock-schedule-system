@@ -1,5 +1,5 @@
 import enum
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship
 
@@ -35,7 +35,7 @@ class User(TimestampMixin, table=True):
         nullable=True,
         ondelete="SET NULL",
     )
-    department: "Department" | None = Relationship(
+    department: Optional["Department"] = Relationship(
         back_populates="users",
         sa_relationship_kwargs={"lazy": "raise"},
     )

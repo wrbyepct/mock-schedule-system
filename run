@@ -53,4 +53,8 @@ migrate() {
     alembic upgrade head
 }
 
+db-shell() {
+    docker compose -f "local.yml" exec db psql -U schedule_app -d schedule_system
+}
+
 "$@"

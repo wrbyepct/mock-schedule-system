@@ -14,7 +14,11 @@ if TYPE_CHECKING:
 class Department(TimestampMixin, table=True):
     __tablename__ = "departments"
 
-    name: str = Field(default="我的部門", max_length=100, unique=True, index=True)
+    name: str = Field(
+        default="我的部門",
+        max_length=100,
+        unique=True,
+    )
 
     # system level skill tags
     skill_tags: list["SkillTag"] = Relationship(
