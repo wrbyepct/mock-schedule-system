@@ -1,12 +1,6 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from fastapi import FastAPI
 
 from app.auth.exceptions import UserExistsError
-
-if TYPE_CHECKING:
-    from fastapi import FastAPI
-
 
 all_exceptions = [UserExistsError]
 

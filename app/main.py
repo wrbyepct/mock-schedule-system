@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.shared.database import engine, init_db
 
+from . import models  # noqa: F401
 from .exceptions import register_all_exceptions
 from .routers import add_all_routers
 

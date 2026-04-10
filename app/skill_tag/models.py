@@ -1,6 +1,4 @@
-from __future__ import annotations
-
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 
 from sqlmodel import Field, Relationship, UniqueConstraint
 
@@ -27,7 +25,7 @@ class SkillTag(TimestampMixin, table=True):
         default=None, foreign_key="departments.id", ondelete="CASCADE"
     )
 
-    department: Department | None = Relationship(
+    department: Optional["Department"] = Relationship(
         back_populates="skill_tags",
         sa_relationship_kwargs={
             "lazy": "raise",
