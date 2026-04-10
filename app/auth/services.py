@@ -2,13 +2,27 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
+from app.user.schemas import UserCreate
+
+from .exceptions import UserExistsError
+
 if TYPE_CHECKING:
-    from sqlmodel.ext.asyncio.session import AsyncSession
+    from app.user.repo import UserRepo
 
 
 class AuthService:
-    async def register(self, user_data: dict, session: AsyncSession):
-        pass
+    async def register(
+        self,
+        user_data: UserCreate,
+        user_repo: UserRepo,
+    ):
+        user = await user_repo.get_user_by_email(user_data.email)
+        if user is not None:
+            raise UserExistsError()  # TODO:Add all exception handlers at once
+
+        new_user = await user_repo.create_user(user_data)
+        return new_user
 
 
-auth_service = AuthService()
+async def get_auth_service():
+    return AuthService()

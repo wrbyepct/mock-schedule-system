@@ -14,6 +14,7 @@ from app.shared.config import settings
 pwd_hasher = PasswordHash.recommended()
 
 
+# do we need salt on this?
 def hash_password(plain_password: str) -> str:
     return pwd_hasher.hash(plain_password)
 

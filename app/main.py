@@ -4,6 +4,7 @@ from fastapi import FastAPI
 
 from app.shared.database import engine, init_db
 
+from .exceptions import register_all_exceptions
 from .routers import add_all_routers
 
 
@@ -26,11 +27,9 @@ app = FastAPI(
 
 
 add_all_routers(app)
-
+register_all_exceptions(app)
 
 # TODO: Registration related models: TimestampMixin, Department, User, SkillTag(System), UserSkillTag(This skill is possesed by what users)
-# TODO: alembic setup
-# TODO: password hash service
 # TODO: Register logic
 
 
