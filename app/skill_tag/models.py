@@ -5,10 +5,11 @@ from typing import TYPE_CHECKING
 from sqlmodel import Field, Relationship, UniqueConstraint
 
 from app.shared.models import TimestampMixin
+from app.user.models import UserSkillTag
 
 if TYPE_CHECKING:
     from app.department.models import Department
-    from app.user.models import UserSkillTag
+    from app.user.models import User
 
 
 class SkillTag(TimestampMixin, table=True):
@@ -33,10 +34,10 @@ class SkillTag(TimestampMixin, table=True):
         },
     )
 
-    user_skill_tags: list[UserSkillTag] = Relationship(
-        back_populates="skill_tag",
+    users: list["User"] = Relationship(
+        back_populates="skill_tags",
+        link_model=UserSkillTag,
         sa_relationship_kwargs={
             "lazy": "raise",
-            "cascade": "all, delete-orphan",
         },
     )

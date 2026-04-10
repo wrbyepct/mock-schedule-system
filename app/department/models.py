@@ -8,6 +8,7 @@ from app.shared.models import TimestampMixin
 
 if TYPE_CHECKING:
     from app.skill_tag.models import SkillTag
+    from app.user.models import User
 
 
 class Department(TimestampMixin, table=True):
@@ -23,3 +24,8 @@ class Department(TimestampMixin, table=True):
             "cascade": "all, delete-orphan",
         },
     )
+
+    users: list["User"] = Relationship(
+        back_populates="department",
+        sa_relationship_kwargs={"lazy": "raise"},
+    )  # TODO: Test department deleted, users are intact

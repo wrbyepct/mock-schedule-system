@@ -28,5 +28,5 @@ async def init_db():
         async with engine.begin() as conn:
             await conn.execute((text("SELECT 'hello'")))
         print("DB connect successfully")
-    except Exception:
-        print("Failed to connect db: {e}")
+    except Exception as e:
+        print(f"Failed to connect db: {e}")
